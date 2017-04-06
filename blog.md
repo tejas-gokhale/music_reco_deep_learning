@@ -1,9 +1,9 @@
 **06-APR-2017**
 --
 Resolved dataset download problems
-Figured out a way to convert .h5 to csv
-Only 77% of the songs occur both in the features data and triplets data
-So triplets data was pruned
+Figured out a way to convert .h5 to csv ...
+Only 77% of the songs occur both in the features data and triplets data.
+So triplets data was pruned.
 
 Can now work on all 3 methods using this.
 1. features.csv for Content-Based
@@ -16,6 +16,6 @@ Work to be done:
 3. @Tejas: Collaborative Filtering
 
 Tejas: 
-'''
+"""
 I am reading my NLP slides that talk about efficient similarity measurement. We could potentially use that for our purposes.
-'''
+"""
