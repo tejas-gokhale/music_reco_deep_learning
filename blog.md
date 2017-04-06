@@ -17,5 +17,6 @@ Work to be done:
 
 Tejas: 
 ```
-I am reading my NLP slides that talk about efficient similarity measurement. We could potentially use that for our purposes.
+I am reading my NLP slides that talk about efficient similarity measurement.
+We could potentially use that for our purposes.
 ```
