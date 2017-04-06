@@ -16,6 +16,6 @@ Work to be done:
 3. @Tejas: Collaborative Filtering
 
 Tejas: 
-"""
+```
 I am reading my NLP slides that talk about efficient similarity measurement. We could potentially use that for our purposes.
-"""
+```
