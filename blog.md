@@ -20,3 +20,15 @@ Tejas:
 I am reading my NLP slides that talk about efficient similarity measurement.
 We could potentially use that for our purposes.
 ```
+
+**19-APR-2017**
+--
+Content-based recommendation code working.
+Results stored in ./results
+
+Decided to use lyrics as inputs to the deep-network. Needs formatting and linking MSD Song-id to Musixmatch Track-id.
+Collaborative filtering in pipeline. top-n similar users using Pearson correlation found out. Working on Recommendations now.
+
+Agenda for 20th:
+1. Complete Project Progress Report
+2. Formulate Deep Network Architecture
