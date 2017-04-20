@@ -225,7 +225,7 @@ avg_tempo_array = []
 avg_time_array = []
 num_of_common_artists = []
 
-for iter in range(500):
+for iter in range(10000):
     my_user_id = random.choice(list(user_dict))
     # print (user_id)
     my_user_profile = make_user_profile(my_user_id, user_dict, song_dict)
@@ -240,7 +240,7 @@ for iter in range(500):
     avg_tempo_array.append(100.0 *abs(my_user_profile[2] - bhai_user_profile[2])/(my_user_profile[2] + 10e-4))
     avg_time_array.append(100.0 *abs(my_user_profile[3] - bhai_user_profile[3])/(my_user_profile[3] + + 10e-4))
     
-    if iter % 100 == 0:
+    if iter % 1000 == 0:
         print (iter)        
 
 plt.subplots_adjust(hspace=0.5)
