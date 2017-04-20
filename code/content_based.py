@@ -150,9 +150,9 @@ def find_dev_stats(user_id, recomm_song, user_dict, user_song_dict, song_dict):
 	time_sig     = float(song_dict[recomm_song][14])
 	
 	if (artist_id in artist_id_list):
-		artist_dev = 0
-	else:
 		artist_dev = 1
+	else:
+		artist_dev = 0
 
 
 	duration_dev = 100.0*(abs(avg_duration - duration)/(avg_duration))
@@ -193,21 +193,25 @@ def main():
 		if(iteration % 1000 == 0):
 			print(iteration)	
 	
-	plt.subplot(221)
+	plt.subplot(231)
 	plt.title('Duration Deviation Histogram', size=8)
 	plt.hist(duration_dev_array, bins=[10*i for i in range(0,20)], facecolor ="orange")
 	
-	plt.subplot(222)
+	plt.subplot(232)
 	plt.title('Key Signature Deviation Histogram', size=8)
 	plt.hist(key_sig_dev_array, bins=[10*i for i in range(0,20)], facecolor ="green")
 	
-	plt.subplot(223)
+	plt.subplot(233)
 	plt.title('Tempo Deviation Histogram', size=8)
 	plt.hist(tempo_dev_array, bins=[10*i for i in range(0,20)], facecolor ="red")
 	
-	plt.subplot(224)
+	plt.subplot(234)
 	plt.title('Time Signature Deviation Histogram', size=8)
 	plt.hist(time_sig_dev_array, bins=[10*i for i in range(0,20)], facecolor ="blue")
+	
+	plt.subplot(235)
+	plt.title('Previously Heard Artists Histogram', size=8)
+	plt.hist(artist_dev_array, facecolor ="purple")
 	plt.show()
 
 main()

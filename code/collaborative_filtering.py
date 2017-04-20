@@ -8,6 +8,9 @@ import numpy as np
 import time
 import operator
 import math
+import csv
+import random
+import matplotlib.pyplot as plt
 
 ## Load Database
 # F. Maxwell Harper and Joseph A. Konstan. 2015. The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems (TiiS) 5, 4, Article 19 (December 2015), 19 pages. DOI=http://dx.doi.org/10.1145/2827872
@@ -91,16 +94,12 @@ def makeRecommendation(my_user):
     sim = dict()
     for user in uid_list:
         set_my, set_user, sim[user] = pearsonSimilarity(my_user, user)
-        
-    
     # print(sim['5a905f000fc1ff3df7ca807d57edb608863db05d'])
     # print(max(sim.items(), key=operator.itemgetter(1))[0])
     # print (sim)
     top10 = sorted(sim.items(), key=operator.itemgetter(1), reverse=True)[:10]
     
     # print(top10)
-    
-    # print(len(sim))
     songs_users = list()
     for user, val in top10:
         songs_users = songs_users + [k for k,v in data[user].items()]
@@ -122,9 +121,160 @@ def makeRecommendation(my_user):
     # print(candidates)
     # print (len(candidates))
     print(max(candidates, key=candidates.get))
+    return top10
 
 my_user = '8305c896f42308824da7d4386f4b9ee584281412'
-makeRecommendation(my_user)
+top10 = makeRecommendation(my_user)
 
-            
+
+def make_song_dict():
+    song_dict = dict()
+    with open('../data/formatted_song_csv.csv', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            song_no             = row[0]
+            song_id				= row[1]
+            album_id			= row[2]
+            album_name			= row[3]
+            artist_id 			= row[4]
+            artist_latitude     = row[5]
+            artist_location     = row[6]
+            artist_longitude    = row[7]
+            artist_name         = row[8]
+            danceability        = row[9]
+            duration            = row[10]
+            key_signature       = row[11]
+            key_signature_conf  = row[12]
+            tempo               = row[13]
+            time_signature      = row[14]
+            time_signature_conf = row[15]
+            title               = row[16]
+            year                = row[17]
+    
+            song_dict[song_id] = [song_no, song_id, album_id, album_name, artist_id, artist_latitude, artist_location, artist_longitude, artist_name, danceability, duration, key_signature, key_signature_conf, tempo, time_signature, time_signature_conf, title, year]
+    
+    return song_dict
+
+def make_user_dict():
+    user_dict = dict()
+    user_song_dict = dict()
+    
+    with open('../data/pruned_triplets.csv', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            user_id = row[0]
+            song_id = row[1]
+            plays   = row[2]
+    
+            if (user_id in user_dict):
+                val = user_dict[user_id]
+                val = val + [(song_id, plays)]
+                user_dict[user_id] = val
+                user_song_dict[user_id] += [song_id]
+    
+            else:
+                user_dict[user_id] = [(song_id, plays)]
+                user_song_dict[user_id] = [song_id]
+    
+    
+    return user_dict, user_song_dict
+
+
+def make_user_profile(user_id, user_dict, song_dict):
+    user_history = user_dict[user_id]
+    
+    artist_id_list = []
+    duration_list  = []
+    key_sig_list   = []
+    tempo_list     = []
+    time_sig_list  = []
+    rating_list    = []
+
+    for entry in user_history:
+        song  = entry[0]
+        plays = int(entry[1])
+    
+        song_profile = song_dict[song]
+        artist_id 	 = str(song_profile[4])
+        duration     = float(song_profile[10])*plays
+        key_sig      = float(song_profile[11])*plays
+        tempo        = float(song_profile[13])*plays
+        time_sig     = float(song_profile[14])*plays
+    
+        artist_id_list.append(artist_id)
+        duration_list.append(duration)
+        key_sig_list.append(key_sig)
+        tempo_list.append(tempo)
+        time_sig_list.append(time_sig)
+        rating_list.append(plays)
+
+    avg_duration = sum(duration_list)/sum(rating_list)
+    avg_key_sig  = sum(key_sig_list)/sum(rating_list)
+    avg_tempo    = sum(tempo_list)/sum(rating_list)
+    avg_time_sig = sum(time_sig_list)/sum(rating_list)
+    
+    return (avg_duration, avg_key_sig, avg_tempo, avg_time_sig, artist_id_list)
+
+
+song_dict = make_song_dict()
+user_dict, user_song_dict = make_user_dict()
+
+avg_dur_array = []
+avg_key_array = []
+avg_tempo_array = []
+avg_time_array = []
+num_of_common_artists = []
+
+for iter in range(1000):
+    my_user_id = random.choice(list(user_dict))
+    # print (user_id)
+    my_user_profile = make_user_profile(my_user_id, user_dict, song_dict)
+    
+    bhai_user_profile = make_user_profile(top10[0][0], user_dict, song_dict)
+    
+    num_of_common_artists.append(100.0 * len(set(my_user_profile[4]).intersection(bhai_user_profile[4])) / len(my_user_profile[4]))
+    
+    
+    avg_dur_array.append(100.0 *abs(my_user_profile[0] - bhai_user_profile[0])/(my_user_profile[0] + + 10e-4))
+    avg_key_array.append(100.0 *abs(my_user_profile[1] - bhai_user_profile[1])/(my_user_profile[1] + 10e-4))
+    avg_tempo_array.append(100.0 *abs(my_user_profile[2] - bhai_user_profile[2])/(my_user_profile[2] + 10e-4))
+    avg_time_array.append(100.0 *abs(my_user_profile[3] - bhai_user_profile[3])/(my_user_profile[3] + + 10e-4))
+    
+    if iter % 100 == 0:
+        print (iter)
         
+
+plt.subplot(231)
+plt.title('Duration Deviation Histogram', size=8)
+plt.hist(avg_dur_array, bins=[10*i for i in range(0,20)], facecolor ="orange")
+
+plt.subplot(232)
+plt.title('Key Signature Deviation Histogram', size=8)
+plt.hist(avg_key_array, bins=[10*i for i in range(0,20)], facecolor ="green")
+
+plt.subplot(233)
+plt.title('Tempo Deviation Histogram', size=8)
+plt.hist(avg_tempo_array, bins=[10*i for i in range(0,20)], facecolor ="red")
+
+plt.subplot(234)
+plt.title('Time Signature Deviation Histogram', size=8)
+plt.hist(avg_time_array, bins=[10*i for i in range(0,20)], facecolor ="blue")
+
+plt.subplot(235)
+plt.title('Number of Common Artists between user and his most similar user', size=8)
+plt.hist(num_of_common_artists, facecolor ="purple")
+plt.show()
+  
+
+# my_user_profile = make_user_profile('8305c896f42308824da7d4386f4b9ee584281412', user_dict, song_dict)
+# 
+# bhai_user_profile = make_user_profile(top10[0][0], user_dict, song_dict)
+# 
+# num_of_common_artists = len(set(my_user_profile[4]).intersection(bhai_user_profile[4]))
+# 
+# print(100.0* num_of_common_artists/len(my_user_profile[4]))
+# print(100.0 *abs(my_user_profile[0] - bhai_user_profile[0])/my_user_profile[0])
+# print(100.0 *abs(my_user_profile[1] - bhai_user_profile[1])/my_user_profile[1])
+# print(100.0 *abs(my_user_profile[2] - bhai_user_profile[2])/my_user_profile[2])
+# print(100.0 *abs(my_user_profile[3] - bhai_user_profile[3])/my_user_profile[3])
+
