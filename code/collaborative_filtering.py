@@ -225,7 +225,7 @@ avg_tempo_array = []
 avg_time_array = []
 num_of_common_artists = []
 
-for iter in range(1000):
+for iter in range(500):
     my_user_id = random.choice(list(user_dict))
     # print (user_id)
     my_user_profile = make_user_profile(my_user_id, user_dict, song_dict)
@@ -241,40 +241,36 @@ for iter in range(1000):
     avg_time_array.append(100.0 *abs(my_user_profile[3] - bhai_user_profile[3])/(my_user_profile[3] + + 10e-4))
     
     if iter % 100 == 0:
-        print (iter)
-        
+        print (iter)        
 
+plt.subplots_adjust(hspace=0.5)
 plt.subplot(231)
-plt.title('Duration Deviation Histogram', size=8)
+plt.xlabel('% Dev. of Recommended Song from Avg. User-Profile', size=6)
+plt.ylabel('# of test samples')
+plt.title('Song Duration', size=6)
 plt.hist(avg_dur_array, bins=[10*i for i in range(0,20)], facecolor ="orange")
 
 plt.subplot(232)
-plt.title('Key Signature Deviation Histogram', size=8)
+plt.xlabel('% Dev. of Recommended Song from Avg. User-Profile', size=6)
+plt.ylabel('# of test samples')
+plt.title('Song Key Signature', size=6)
 plt.hist(avg_key_array, bins=[10*i for i in range(0,20)], facecolor ="green")
 
 plt.subplot(233)
-plt.title('Tempo Deviation Histogram', size=8)
+plt.xlabel('% Dev. of Recommended Song from Avg. User-Profile', size=6)
+plt.ylabel('# of test samples')
+plt.title('Song Tempo', size=6)
 plt.hist(avg_tempo_array, bins=[10*i for i in range(0,20)], facecolor ="red")
 
 plt.subplot(234)
-plt.title('Time Signature Deviation Histogram', size=8)
+plt.xlabel('% Dev. of Recommended Song from Avg. User-Profile', size=6)
+plt.ylabel('# of test samples')
+plt.title('Song Time Signature', size=6)
 plt.hist(avg_time_array, bins=[10*i for i in range(0,20)], facecolor ="blue")
 
 plt.subplot(235)
-plt.title('Number of Common Artists between user and his most similar user', size=8)
+plt.title('Common artists heard by similar users', size=6)
+plt.xlabel('% of Common Artists between user and most similar user', size=6)
+plt.ylabel('# of test samples')
 plt.hist(num_of_common_artists, facecolor ="purple")
 plt.show()
-  
-
-# my_user_profile = make_user_profile('8305c896f42308824da7d4386f4b9ee584281412', user_dict, song_dict)
-# 
-# bhai_user_profile = make_user_profile(top10[0][0], user_dict, song_dict)
-# 
-# num_of_common_artists = len(set(my_user_profile[4]).intersection(bhai_user_profile[4]))
-# 
-# print(100.0* num_of_common_artists/len(my_user_profile[4]))
-# print(100.0 *abs(my_user_profile[0] - bhai_user_profile[0])/my_user_profile[0])
-# print(100.0 *abs(my_user_profile[1] - bhai_user_profile[1])/my_user_profile[1])
-# print(100.0 *abs(my_user_profile[2] - bhai_user_profile[2])/my_user_profile[2])
-# print(100.0 *abs(my_user_profile[3] - bhai_user_profile[3])/my_user_profile[3])
-
