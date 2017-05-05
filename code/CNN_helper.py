@@ -9,12 +9,10 @@ max_key_sig  = 11
 max_tempo    = 262.828
 max_time_sig = 7
 
-
-
 def make_user_dict():
 	user_dict = dict()
 
-	with open('pruned_triplets.csv', newline='') as csvfile:
+	with open('../data/triplets.csv', newline='') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
 		for row in spamreader:
 			user_id = row[0]
@@ -34,7 +32,7 @@ def make_user_dict():
 def make_song_dict():
 
 	song_dict = dict()
-	with open('formatted_song_csv.csv', newline='') as csvfile:
+	with open('../data/formatted_song_csv.csv', newline='') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
 		for row in spamreader:
 			song_no             = row[0]
@@ -66,7 +64,7 @@ def make_song_to_user_dict():
 
 	song_to_user_dict = dict()
 
-	with open('pruned_triplets.csv', newline='') as csvfile:
+	with open('../data/pruned_triplets.csv', newline='') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
 		for row in spamreader:
 			user_id = row[0]
@@ -137,37 +135,29 @@ def make_song_to_user_profile_dict(song_to_user_dict, user_dict, song_dict):
 
 
 
-def main():
+def cnn_helper():
 
-	user_dict                 = make_user_dict()
-
+	user_dict = make_user_dict()
+	print('    1.1 yo')
 	"""user_dict is a dictionary which uses user_id as the key.
-	   The value is of the form [(song1, #plays), (song2, #plays).....]
+	The value is of the form [(song1, #plays), (song2, #plays).....]
 	"""
-	song_dict                 = make_song_dict()
-	
+	song_dict = make_song_dict()
+	print('    1.2 yo')
 	"""song_dict is a dictionary which uses song_id as the key.
-	   The value is of the form [song_no, song_id, album_id, album_name, artist_id, artist_latitude, 
-	   							 artist_location, artist_longitude, artist_name, danceability, duration, 
-	   							 key_signature, key_signature_conf, tempo, time_signature, time_signature_conf,
-	   							 title, year]
+	The value is of the form 
+	[song_no, song_id, album_id, album_name, artist_id, artist_latitude, artist_location, artist_longitude, artist_name, danceability, duration, key_signature, key_signature_conf, tempo, time_signature, time_signature_conf,title, year]
 
 	"""
-	song_to_user_dict         = make_song_to_user_dict()
-
-	"""song_to_user dict is a dictionary which uses song_id as the key. 
-	   The value is of the form [user_id1, user_id2....]
+	song_to_user_dict = make_song_to_user_dict()
+	print('    1.3 yo')
+	"""song_to_user dict is a dictionary which uses song_id as the key. The value is of the form [user_id1, user_id2....]
 	"""
 
 	song_to_user_profile_dict = make_song_to_user_profile_dict(song_to_user_dict, user_dict, song_dict)
-
+	print('    1.4 yo')
 	""""song_to_user_profile_dict is a dictionary which uses song_id as the key
 		The value is of the form [[user_id1, avg_duration_u1, avg_key_sig_u1, avg_tempo_u1, avg_time_sig_u1],
-								  [user_id2, avg_duration_u2, avg_key_sig_u2, avg_tempo_u2, avg_time_sig_u2],
-								  .
-								  .
-								  																			]
+[user_id2, avg_duration_u2, avg_key_sig_u2, avg_tempo_u2, avg_time_sig_u2],]
 	"""
-
-
-main()
+	return song_to_user_profile_dict
