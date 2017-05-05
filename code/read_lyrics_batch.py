@@ -39,12 +39,13 @@ pruning_list = corr_dict.keys()
 
 print ('3. Correspondences loaded')
 
-batch_size = len(data_np) # default 64
+batch_size = 64 # default 64
 rand_idx = random.sample(range(len(data)), batch_size)
 data_batch = data_np[rand_idx]
 keys = range(5001)
 bow_dict = [[]] * batch_size
 default_append = [239.236, 5.74, 3.726, 126.20]
+
 for i in range(batch_size):
     # print(i)
     bow_dict[i] = {key : 1e-6 for key in keys}
@@ -56,6 +57,7 @@ for i in range(64):
     data[i] = data[i].strip().split(',')
     print('#[%d / 64] ' % i, data[i][0])
     bow_dict[i][0] = corr_dict[data[i][0]]
+    print(bow_dict[i][0])
 
     for j in range(2,len(data[i])):
         key = int(data[i][j].split(sep, 1)[0])
@@ -69,8 +71,9 @@ for i in range(64):
     
     print(len(bow_dict[i]))
     
-    if bow_dict[i][0] in song_to_user_profile.keys():
+    if bow_dict[i][0] in song_to_user_profile:
         i = i+1
+        print(bow_dict[i][0])
         num_users = len(song_to_user_profile[bow_dict[i][0]])
         inp = [[]] * num_users
         for u in range(num_users):
