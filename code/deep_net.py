@@ -1,73 +1,77 @@
 import numpy as np
+import pandas
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.wrappers.scikit_learn import KerasRegressor
 import csv
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Activation, InputLayer
 from keras import backend as K
 from keras.wrappers.scikit_learn import KerasRegressor
+import numpy.matlib as ml
+from sklearn.preprocessing import minmax_scale
+
 batch_size_nn = 1
 epochs = 20
 
 train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
 test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
+valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
+
 print(train_set.shape)
 
+# TRAIN
+train_in = train_set[:, 0:100]
+print(train_in.shape)
+train_in_normed = minmax_scale(train_in, axis = 0)
+train_out = train_set[:, -1]
+train_out_normed = minmax_scale(train_out, axis = 0)
 
-input_nn = train_set[:, 0:100]
-print(input_nn.shape)
+# TEST
+test_in_normed = minmax_scale(test_set[:, 0:100], axis = 0)
+test_out_normed = minmax_scale(test_set[:, -1] , axis = 0)
 
-input_normed = input_nn / input_nn.max(axis=0)
-print(input_normed[1, :])
+# VALIDATION
+valid_in_normed = minmax_scale(valid_set[:, 0:100], axis = 0)
+valid_out_normed = minmax_scale(valid_set[:, -1] , axis = 0)
 
-output_nn = train_set[:, -1]
-output_normed = output_nn / output_nn.max(axis=0)
-print(output_normed)
+model = Sequential()
+#input_dim = (5004,)
+input_dim = (100,)
+model.add(InputLayer(input_shape=(train_in.shape[1],)))
+model.add(Dense(300, activation='tanh', input_shape = input_dim))
+#model.add(Dropout(0.5))
+#model.add(Dropout(0.5))
+# model.add(Dense(400, activation='tanh'))
+model.add(Dense(250, activation='tanh'))
+model.add(Dense(100, activation='tanh'))
 
-print(output_nn.shape)
+#model.add(Dropout(0.5))
+model.add(Dense(20, activation='tanh'))
+model.add(Dense(1, activation='linear'))
 
-def baseline_model():
-	model = Sequential()
-	#input_dim = (5004,)
-	input_dim = (100,)
-	model.add(InputLayer(input_shape=(input_nn.shape[1],)))
-	model.add(Dense(50, activation='relu', input_shape = input_dim))
-	model.add(Dropout(0.5))
-	#model.add(Dense(20, activation='relu'))
-	#model.add(Dropout(0.5))
-	#model.add(Dense(10, activation='relu'))
-	#model.add(Dropout(0.5))
-	model.add(Dense(1, activation='sigmoid'))
+# Compile model
+model.compile(loss='mean_squared_error', optimizer='adam')
+print(model.summary())
+    
+# FUT MODEL ON TRAIN DATA
+model.fit(train_in_normed, train_out_normed, epochs = 50, shuffle=True)
 
-	# Compile model
-	model.compile(loss='mean_squared_error', optimizer='adam')
-	print(model.summary())
+# EVALUATE ON VALIDATION DATA
+score = model.evaluate(valid_in_normed, valid_out_normed, verbose=1)
 
-	return model
+# TEST ON TEST DATA
+y_pred = model.predict(test_in_normed, verbose=1)
 
-
-# fix random seed for reproducibility
-seed = 7
-np.random.seed(seed)
-# evaluate model with standardized dataset
-estimator = KerasRegressor(build_fn=baseline_model, nb_epoch=100, batch_size=5, verbose=0)
-
-kfold = KFold(n_splits=10, random_state=seed)
-results = cross_val_score(estimator, X, Y, cv=kfold)
-print("Results: %.2f (%.2f) MSE" % (results.mean(), results.std()))
-
-#model.fit(input_normed,output_normed,epochs = 10,batch_size=128, shuffle=True)
-# test_normed = test_set[:, 0:100] / test_set[:, 0:100].max(axis=0)
-# print("test_normed.shape",test_normed.shape)
-# test_out_normed = test_set[:, -1] /test_set[:, -1].max(axis=0)
-#score = model.evaluate(test_normed,test_out_normed, verbose=0)
 #print("\n%s: %0.2f%%"%(model.metric_names[1]))
-#print("score",score)
-#y_pred = model.predict(test_normed,verbose=1)
-#print("test_out_normed",test_out_normed)
-#print("y_pred",y_pred)
-#print("np.abs(y_pred - test_set[:, -1])/test_set[:, -1]",np.sum(np.abs(y_pred- test_out_normed)**2)/8657)
-
-estimator = KerasRegressor(build_fn=model, nb_epoch = 20, batch_size = 16, verbose = 0, shuffle = True)
-
-score = estimator.score(test_normed,test_out_normed)
 print("score",score)
+print("y_pred.shape", y_pred.shape)
+print("y_pred", y_pred)
+print("test_out_normed", test_out_normed)
+test_out_normed = np.expand_dims(test_out_normed, axis=1)
+#print("output_normed.shape", test_out_normed.shape)
+print("test_out_normed.shape", test_out_normed.shape)
+
+# print("y_pred",y_pred[0:10], "y_true", output_normed[0:10])
+print("np.abs(y_pred - y_true)/y_true)", np.sum(np.abs(y_pred - test_out_normed) **2) / y_pred.shape[0])
