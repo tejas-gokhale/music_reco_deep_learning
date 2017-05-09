@@ -1,156 +1,120 @@
-<<<<<<< HEAD
 import numpy as np
 import pandas
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasRegressor
 import csv
+import math
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Activation, InputLayer
 from keras import backend as K
+from keras import regularizers
 from keras.wrappers.scikit_learn import KerasRegressor
 import numpy.matlib as ml
 from sklearn.preprocessing import minmax_scale
+import matplotlib.pyplot as plt
 
+
+#####################
+# Params
 batch_size_nn = 1
-epochs = 20
+num_epochs = 10
+alpha = 0.1
+input_size = 5004	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
+#####################
 
-train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
-test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
-valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
+if input_size == 5004:
+	train_set = np.genfromtxt('../data/all/data_train.csv', delimiter = ",")
+	print('1. Read Train')
+	test_set = np.genfromtxt('../data/all/data_test.csv', delimiter = ",")
+	print('2. Read Test')
+	valid_set = np.genfromtxt('../data/all/data_valid.csv', delimiter = ",")
+	print('3. Read Validation')
+elif input_size == 100:
+	train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
+	print('1. Read Train')
+	test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
+	print('2. Read Test')
+	valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
+	print('3. Read Validation')
+
+
 
 print(train_set.shape)
 
 # TRAIN
-train_in = train_set[:, 0:100]
+train_in = train_set[:, 0:input_size]
 print(train_in.shape)
 train_in_normed = minmax_scale(train_in, axis = 0)
 train_out = train_set[:, -1]
 train_out_normed = minmax_scale(train_out, axis = 0)
 
 # TEST
-test_in_normed = minmax_scale(test_set[:, 0:100], axis = 0)
+test_in_normed = minmax_scale(test_set[:, 0:input_size], axis = 0)
 test_out_normed = minmax_scale(test_set[:, -1] , axis = 0)
 
 # VALIDATION
-valid_in_normed = minmax_scale(valid_set[:, 0:100], axis = 0)
+valid_in_normed = minmax_scale(valid_set[:, 0:input_size], axis = 0)
 valid_out_normed = minmax_scale(valid_set[:, -1] , axis = 0)
 
+# NETWORK : 100-50-20-1
 model = Sequential()
-#input_dim = (5004,)
-input_dim = (100,)
+input_dim = (input_size,)
+#input_dim = (100,)
 model.add(InputLayer(input_shape=(train_in.shape[1],)))
-model.add(Dense(300, activation='tanh', input_shape = input_dim))
-#model.add(Dropout(0.5))
-#model.add(Dropout(0.5))
-# model.add(Dense(400, activation='tanh'))
-model.add(Dense(250, activation='tanh'))
-model.add(Dense(100, activation='tanh'))
-
-#model.add(Dropout(0.5))
-model.add(Dense(20, activation='tanh'))
-model.add(Dense(1, activation='linear'))
+model.add(Dense(500, activation='relu', input_shape = input_dim, W_regularizer=regularizers.l2(alpha)))
+model.add(Dropout(0.5))
+# model.add(Dense(200, activation='relu', W_regularizer=regularizers.l2(alpha)))
+model.add(Dense(200, activation='relu'))
+model.add(Dropout(0.5))
+# model.add(Dense(100, activation='relu', W_regularizer=regularizers.l2(alpha)))
+model.add(Dense(100, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(1, activation='sigmoid'))
 
 # Compile model
-model.compile(loss='mean_squared_error', optimizer='adam')
+model.compile(loss='mean_squared_error', optimizer='sgd')
 print(model.summary())
     
-# FUT MODEL ON TRAIN DATA
-model.fit(train_in_normed, train_out_normed, epochs = 50, shuffle=True)
+# FIT MODEL ON TRAIN DATA
 
-# EVALUATE ON VALIDATION DATA
-score = model.evaluate(valid_in_normed, valid_out_normed, verbose=1)
+train_history = []
+valid_history = []
+test_history = []
 
-# TEST ON TEST DATA
-y_pred = model.predict(test_in_normed, verbose=1)
+for i in range(num_epochs):
+	history = model.fit(train_in_normed, train_out_normed, epochs = 1, batch_size = 32, shuffle=True)
+	train_history.append(list(history.history.values())[0][0])
+	score_valid = model.evaluate(valid_in_normed, valid_out_normed, verbose=1)
+	valid_history.append(score_valid)
+	score_test = model.evaluate(test_in_normed, test_out_normed, verbose=1)
+	test_history.append(score_test)
 
-#print("\n%s: %0.2f%%"%(model.metric_names[1]))
-print("score",score)
-print("y_pred.shape", y_pred.shape)
-print("y_pred", y_pred)
-print("test_out_normed", test_out_normed)
-test_out_normed = np.expand_dims(test_out_normed, axis=1)
-#print("output_normed.shape", test_out_normed.shape)
-print("test_out_normed.shape", test_out_normed.shape)
+#print('\n')
+#print(train_history)
+#print(valid_history)
+plt.gca().set_yscale('log')
+plt.plot(range(1,num_epochs+1), train_history, label="train log-loss")
+plt.plot(range(1,num_epochs+1), valid_history, label="validation log-loss")
+plt.plot(range(1,num_epochs+1), test_history, label="test log-loss")
+plt.legend()
+plt.title('Training MSE Loss')
+plt.ylabel('Loss')
+plt.xlabel('epoch')
+plt.show()
 
-# print("y_pred",y_pred[0:10], "y_true", output_normed[0:10])
-=======
-import numpy as np
-import pandas
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.wrappers.scikit_learn import KerasRegressor
-import csv
-import keras
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten, Activation, InputLayer
-from keras import backend as K
-from keras.wrappers.scikit_learn import KerasRegressor
-import numpy.matlib as ml
-from sklearn.preprocessing import minmax_scale
-
-batch_size_nn = 1
-epochs = 20
-
-train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
-test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
-valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
-
-print(train_set.shape)
-
-# TRAIN
-train_in = train_set[:, 0:100]
-print(train_in.shape)
-train_in_normed = minmax_scale(train_in, axis = 0)
-train_out = train_set[:, -1]
-train_out_normed = minmax_scale(train_out, axis = 0)
-
-# TEST
-test_in_normed = minmax_scale(test_set[:, 0:100], axis = 0)
-test_out_normed = minmax_scale(test_set[:, -1] , axis = 0)
-
-# VALIDATION
-valid_in_normed = minmax_scale(valid_set[:, 0:100], axis = 0)
-valid_out_normed = minmax_scale(valid_set[:, -1] , axis = 0)
-
-model = Sequential()
-#input_dim = (5004,)
-input_dim = (100,)
-model.add(InputLayer(input_shape=(train_in.shape[1],)))
-model.add(Dense(300, activation='tanh', input_shape = input_dim))
-#model.add(Dropout(0.5))
-#model.add(Dropout(0.5))
-# model.add(Dense(400, activation='tanh'))
-model.add(Dense(250, activation='tanh'))
-model.add(Dense(100, activation='tanh'))
-
-#model.add(Dropout(0.5))
-model.add(Dense(20, activation='tanh'))
-model.add(Dense(1, activation='linear'))
-
-# Compile model
-model.compile(loss='mean_squared_error', optimizer='adam')
-print(model.summary())
-    
-# FUT MODEL ON TRAIN DATA
-model.fit(train_in_normed, train_out_normed, epochs = 50, shuffle=True)
-
-# EVALUATE ON VALIDATION DATA
-score = model.evaluate(valid_in_normed, valid_out_normed, verbose=1)
 
 # TEST ON TEST DATA
+print('\n')
 y_pred = model.predict(test_in_normed, verbose=1)
+score_test = model.evaluate(test_in_normed, test_out_normed, verbose=1)
+print ("######################")
+print("score_test",score_test)
+#print("y_pred.shape", y_pred.shape)
+#print("test_out_normed.shape", test_out_normed.shape)
+#print("y_pred", y_pred)
 
-#print("\n%s: %0.2f%%"%(model.metric_names[1]))
-print("score",score)
-print("y_pred.shape", y_pred.shape)
-print("y_pred", y_pred)
-print("test_out_normed", test_out_normed)
 test_out_normed = np.expand_dims(test_out_normed, axis=1)
-#print("output_normed.shape", test_out_normed.shape)
-print("test_out_normed.shape", test_out_normed.shape)
+#print("test_out_normed", test_out_normed)
+
 
 # print("y_pred",y_pred[0:10], "y_true", output_normed[0:10])
->>>>>>> updated main
-print("np.abs(y_pred - y_true)/y_true)", np.sum(np.abs(y_pred - test_out_normed) **2) / y_pred.shape[0])
+# print("np.abs(y_pred - y_true)/y_true)", np.sum(np.abs(y_pred - test_out_normed) **2) / y_pred.shape[0])
