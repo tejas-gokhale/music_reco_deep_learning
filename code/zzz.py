@@ -1,7 +1,7 @@
 import numpy as np
-csv = np.genfromtxt ('../data/inputs.csv', delimiter=",")
-print(csv.shape)
+# csv = np.genfromtxt ('../data/all/inputs.csv', delimiter=",")
+# print(csv.shape)
 
 from split_train_test_valid import split_data
 
-split_data('../data/inputs.csv')
+split_data('../data/all/inputs.csv')

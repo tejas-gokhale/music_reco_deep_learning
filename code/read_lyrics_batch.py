@@ -9,22 +9,6 @@ import csv
 batch_size_nn = 1
 epochs = 20
 
-
-#model = Sequential()
-#input_dim = (5004,)
-#input_dim = (100,)
-#model.add(InputLayer(input_shape=(5004,)))
-#model.add(Dense(50, activation='relu', input_shape = input_dim))
-#model.add(Dense(20, activation='relu'))
-#model.add(Dense(10, activation='relu'))
-#model.add(Dense(1, activation='relu'))
-
-# Compile model
-#model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
-#print(model.summary())
-
-
-
 ####################
 batch_size = 1000
 iterations = 100 #CHANGE THIS
@@ -100,7 +84,7 @@ with open('inputs.csv', 'w', newline='') as csvfile:
 
                 for u in range(num_users):
                     line = inp[1:] + song_to_user_profile[bow_dict[i][0]][u][1:]
-                    line = line[0:96]+line[-5:]
+                    #line = line[0:96]+line[-5:]
 
                     spamwriter.writerow(line)
      
