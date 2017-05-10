@@ -1,12 +1,12 @@
 import numpy as np
-import pandas
+#import pandas
 import csv
 import math
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Activation, InputLayer
 from keras import backend as K
-from keras import regularizers
+from keras import regularizers, optimizers
 from keras.wrappers.scikit_learn import KerasRegressor
 import numpy.matlib as ml
 from sklearn.preprocessing import minmax_scale
@@ -17,28 +17,36 @@ import matplotlib.pyplot as plt
 # Params
 batch_size_nn = 1
 num_epochs = 10
-alpha = 0.1
+alpha = 0.2
 input_size = 5004	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
+#input_size = 100
 #####################
 
 if input_size == 5004:
 	train_set = np.genfromtxt('../data/all/data_train.csv', delimiter = ",")
 	print('1. Read Train')
+	np.random.shuffle(train_set)
 	test_set = np.genfromtxt('../data/all/data_test.csv', delimiter = ",")
 	print('2. Read Test')
+	np.random.shuffle(test_set)
 	valid_set = np.genfromtxt('../data/all/data_valid.csv', delimiter = ",")
 	print('3. Read Validation')
+	np.random.shuffle(valid_set)
 elif input_size == 100:
-	train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
+	train_set = np.genfromtxt('../data/new/data_train.csv', delimiter = ",")
 	print('1. Read Train')
-	test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
+	np.random.shuffle(train_set)
+	print("train_set.shape",train_set.shape)
+	test_set = np.genfromtxt('../data/new/data_test.csv', delimiter = ",")
 	print('2. Read Test')
-	valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
+	np.random.shuffle(test_set)
+	print("test_set.shape",test_set.shape)
+	#np.savetxt("../data/test_shuffle.csv", test_set, delimiter=",", fmt='%s')
+	valid_set = np.genfromtxt('../data/new/data_valid.csv', delimiter = ",")
 	print('3. Read Validation')
+	np.random.shuffle(valid_set)
+	print("valid_set.shape",valid_set.shape)
 
-
-
-print(train_set.shape)
 
 # TRAIN
 train_in = train_set[:, 0:input_size]
@@ -60,18 +68,23 @@ model = Sequential()
 input_dim = (input_size,)
 #input_dim = (100,)
 model.add(InputLayer(input_shape=(train_in.shape[1],)))
-model.add(Dense(500, activation='relu', input_shape = input_dim, W_regularizer=regularizers.l2(alpha)))
-model.add(Dropout(0.5))
-# model.add(Dense(200, activation='relu', W_regularizer=regularizers.l2(alpha)))
-model.add(Dense(200, activation='relu'))
-model.add(Dropout(0.5))
-# model.add(Dense(100, activation='relu', W_regularizer=regularizers.l2(alpha)))
-model.add(Dense(100, activation='relu'))
-model.add(Dropout(0.5))
+model.add(Dense(500, activation='tanh', input_shape = input_dim, W_regularizer=regularizers.l2(alpha)))
+#model.add(Dense(50, activation='tanh', input_shape = input_dim, W_regularizer=regularizers.l2(alpha)))
+#model.add(Dropout(0.5))
+model.add(Dense(200, activation='tanh', W_regularizer=regularizers.l2(alpha)))
+#model.add(Dense(200, activation='tanh'))
+#model.add(Dense(20, activation='tanh',W_regularizer=regularizers.l2(alpha)))
+#model.add(Dropout(0.5))
+model.add(Dense(100, activation='tanh', W_regularizer=regularizers.l2(alpha)))
+#model.add(Dense(100, activation='relu'))
+model.add(Dense(10, activation='tanh',W_regularizer=regularizers.l2(alpha)))
+#model.add(Dropout(0.5))
 model.add(Dense(1, activation='sigmoid'))
 
 # Compile model
-model.compile(loss='mean_squared_error', optimizer='sgd')
+#sgd = Keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.0, nesterov=False)
+model.compile(loss='mean_squared_error', optimizer=sgd)
 print(model.summary())
     
 # FIT MODEL ON TRAIN DATA
