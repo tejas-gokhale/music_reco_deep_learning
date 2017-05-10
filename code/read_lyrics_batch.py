@@ -47,7 +47,7 @@ keys = range(num_keys)
 flag = 0
 
 
-with open('inputs.csv', 'w', newline='') as csvfile:
+with open('../data/inputs.csv', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
     for iteration in range(iterations):

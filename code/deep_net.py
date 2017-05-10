@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 batch_size_nn = 1
 num_epochs = 10
 alpha = 0.2
-input_size = 5004	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
+input_size = 100	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
 #input_size = 100
 #####################
 
@@ -51,15 +51,24 @@ elif input_size == 100:
 # TRAIN
 train_in = train_set[:, 0:input_size]
 print(train_in.shape)
+train_in = transformer.fit_transform(train_set)
+train_in = train_in.toarray()
+
 train_in_normed = minmax_scale(train_in, axis = 0)
 train_out = train_set[:, -1]
 train_out_normed = minmax_scale(train_out, axis = 0)
 
 # TEST
-test_in_normed = minmax_scale(test_set[:, 0:input_size], axis = 0)
+test_in = test_set[:, 0:input_size]
+test_in = transformer.fit_transform(test_set)
+test_in = test_in.toarray()
+test_in_normed = minmax_scale(test_in, axis = 0)
 test_out_normed = minmax_scale(test_set[:, -1] , axis = 0)
 
 # VALIDATION
+valid_in = valid_set[:, 0:input_size]
+valid_in = transformer.fit_transform(valid_set)
+valid_in = valid_in.toarray()
 valid_in_normed = minmax_scale(valid_set[:, 0:input_size], axis = 0)
 valid_out_normed = minmax_scale(valid_set[:, -1] , axis = 0)
 
