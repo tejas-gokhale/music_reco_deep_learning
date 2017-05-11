@@ -11,7 +11,7 @@ from keras.wrappers.scikit_learn import KerasRegressor
 import numpy.matlib as ml
 from sklearn.preprocessing import minmax_scale
 import matplotlib.pyplot as plt
-
+from CNN_helper import generate_input_vector
 
 #####################
 # Params
@@ -51,8 +51,8 @@ elif input_size == 100:
 # TRAIN
 train_in = train_set[:, 0:input_size]
 print(train_in.shape)
-train_in = transformer.fit_transform(train_set)
-train_in = train_in.toarray()
+#train_in = transformer.fit_transform(train_set)
+#train_in = train_in.toarray()
 
 train_in_normed = minmax_scale(train_in, axis = 0)
 train_out = train_set[:, -1]
@@ -60,15 +60,15 @@ train_out_normed = minmax_scale(train_out, axis = 0)
 
 # TEST
 test_in = test_set[:, 0:input_size]
-test_in = transformer.fit_transform(test_set)
-test_in = test_in.toarray()
+#test_in = transformer.fit_transform(test_set)
+#test_in = test_in.toarray()
 test_in_normed = minmax_scale(test_in, axis = 0)
 test_out_normed = minmax_scale(test_set[:, -1] , axis = 0)
 
 # VALIDATION
 valid_in = valid_set[:, 0:input_size]
-valid_in = transformer.fit_transform(valid_set)
-valid_in = valid_in.toarray()
+#valid_in = transformer.fit_transform(valid_set)
+#valid_in = valid_in.toarray()
 valid_in_normed = minmax_scale(valid_set[:, 0:input_size], axis = 0)
 valid_out_normed = minmax_scale(valid_set[:, -1] , axis = 0)
 
@@ -140,3 +140,21 @@ test_out_normed = np.expand_dims(test_out_normed, axis=1)
 
 # print("y_pred",y_pred[0:10], "y_true", output_normed[0:10])
 # print("np.abs(y_pred - y_true)/y_true)", np.sum(np.abs(y_pred - test_out_normed) **2) / y_pred.shape[0])
+
+my_user = '8305c896f42308824da7d4386f4b9ee584281412'
+input_vector = generate_input_vector(my_user)
+
+network_input = input_vector[:,1:5005]
+network_input_normed = minmax_scale(network_input_normed, axis = 0)
+song_ratings = model.predict(network_input_normed, verbose = 1)
+
+print(input_vector[np.argmax(song_ratings)][0])
+
+#with open('ratings.csv', 'w', newline='') as csvfile:
+#    spamwriter = csv.writer(csvfile, delimiter='', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+#    for entry in song_ratings:
+#        spamwriter.writerow(entry)
+
+   # for entry in encoded_test:
+   #     spamwriter.writerow(entry)
