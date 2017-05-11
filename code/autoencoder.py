@@ -55,12 +55,23 @@ decoder_layer = autoencoder.layers[-1]
 autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
 
 autoencoder.fit(train_in_normed, train_in_normed,
-                epochs=200,
+                epochs=1,
                 batch_size=256,
                 shuffle=True,
                 validation_data=(test_in_normed, test_in_normed))
 
 encoded_train = encoder.predict(train_in_normed)
 encoded_test = encoder.predict(test_in_normed)
+
+
+with open('encoded.csv', 'w', newline='') as csvfile:
+    spamwriter = csv.writer(csvfile, delimiter='', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+    for entry in encoded_train:
+        spamwriter.writerow(entry)
+
+    for entry in encoded_test:
+        spamwriter.writerow(entry)
+
 #print(encoded_input)
 #decoded_imgs = decoder.predict(encoded_imgs)
