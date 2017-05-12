@@ -10,6 +10,8 @@ from keras import regularizers, optimizers
 from keras.wrappers.scikit_learn import KerasRegressor
 import numpy.matlib as ml
 from sklearn.preprocessing import minmax_scale
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from CNN_helper import generate_input_vector
 
@@ -22,8 +24,13 @@ input_size = 100	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
 #input_size = 100
 #####################
 
+<<<<<<< HEAD
+if input_size == 1004:
+	train_set = np.genfromtxt('../data/all/data_train.csv', delimiter = ",")
+=======
 if input_size == 5004:
 	train_set = np.genfromtxt('../data/new/data_train.csv', delimiter = ",")
+>>>>>>> 3bc9c40d564bf2be6fc17a307b47dafbefd0488b
 	print('1. Read Train')
 	np.random.shuffle(train_set)
 	test_set = np.genfromtxt('../data/new/data_test.csv', delimiter = ",")
@@ -121,7 +128,9 @@ plt.legend()
 plt.title('Training MSE Loss')
 plt.ylabel('Loss')
 plt.xlabel('epoch')
-plt.show()
+#plt.show()
+fig = plt.figure()
+fig.savefig('temp.png')
 
 
 # TEST ON TEST DATA
@@ -141,7 +150,7 @@ test_out_normed = np.expand_dims(test_out_normed, axis=1)
 # print("y_pred",y_pred[0:10], "y_true", output_normed[0:10])
 # print("np.abs(y_pred - y_true)/y_true)", np.sum(np.abs(y_pred - test_out_normed) **2) / y_pred.shape[0])
 
-my_user = '8305c896f42308824da7d4386f4b9ee584281412'
+my_user = '5a905f000fc1ff3df7ca807d57edb608863db05d'
 input_vector = generate_input_vector(my_user)
 print (input_vector[0])
 
@@ -151,10 +160,95 @@ for i in range(len(input_vector)):
 print (network_input[0])
 
 
+<<<<<<< HEAD
+network_input=[]
+
+for i in range(len(input_vector)):
+              network_input.append(input_vector[i][1:])
+#print (network_input[0])
+ 
+=======
+>>>>>>> 3bc9c40d564bf2be6fc17a307b47dafbefd0488b
+network_input_normed = minmax_scale(np.array(network_input), axis = 0)
+song_ratings = model.predict(network_input_normed, verbose = 1)
+ 
+print("1",input_vector[np.argmax(song_ratings)][0])
+
+my_user = '732f88be38fae217f8ab7e24c20dd072436e3e40'
+input_vector = generate_input_vector(my_user)
+
+network_input=[]
+
+for i in range(len(input_vector)):
+              network_input.append(input_vector[i][1:])
+#print (network_input[0])
+
 network_input_normed = minmax_scale(np.array(network_input), axis = 0)
 song_ratings = model.predict(network_input_normed, verbose = 1)
 
-print(input_vector[np.argmax(song_ratings)][0])
+print("2",input_vector[np.argmax(song_ratings)][0])
+
+my_user = '9b887e10a4711486085c4fae2d2599fc0d2c484d'
+input_vector = generate_input_vector(my_user)
+
+network_input=[]
+
+for i in range(len(input_vector)):
+              network_input.append(input_vector[i][1:])
+#print (network_input[0])
+
+network_input_normed = minmax_scale(np.array(network_input), axis = 0)
+song_ratings = model.predict(network_input_normed, verbose = 1)
+
+print("3",input_vector[np.argmax(song_ratings)][0])
+
+my_user = '76235885b32c4e8c82760c340dc54f9b608d7d7e'
+input_vector = generate_input_vector(my_user)
+
+network_input=[]
+
+for i in range(len(input_vector)):
+              network_input.append(input_vector[i][1:])
+#print (network_input[0])
+
+network_input_normed = minmax_scale(np.array(network_input), axis = 0)
+song_ratings = model.predict(network_input_normed, verbose = 1)
+
+print("4",input_vector[np.argmax(song_ratings)][0])
+
+
+#network_input = input_vector[:,1:5005]
+#network_input_normed = minmax_scale(network_ut, axis = 0)
+#song_ratings = model.predict(network_input_normed, verbose = 1)
+
+#print("5a905f000fc1ff3df7ca807d57edb608863db05d",input_vector[np.argmax(song_ratings)][0])
+
+#my_user_1 = '732f88be38fae217f8ab7e24c20dd072436e3e40'
+#input_vector_1 = np.array(generate_input_vector(my_user_1))
+
+#network_input_1 = input_vector_1[:,1:5005]
+#network_input_normed_1 = minmax_scale(network_input_1, axis = 0)
+#song_ratings_1 = model.predict(network_input_normed_1, verbose = 1)
+#print("732f88be38fae217f8ab7e24c20dd072436e3e40",input_vector_1[np.argmax(song_ratings_1)][0])
+
+#my_user_2 = '9b887e10a4711486085c4fae2d2599fc0d2c484d'
+#input_vector_2 = np.array(generate_input_vector(my_user_2))
+
+#network_input_2 = input_vector_2[:,1:5005]
+#network_input_normed_2 = minmax_scale(network_input_2, axis = 0)
+#song_ratings_2 = model.predict(network_input_normed_2, verbose = 1)
+#print("9b88",input_vector_2[np.argmax(song_ratings_2)][0])
+
+#my_user_3 = '76235885b32c4e8c82760c340dc54f9b608d7d7e' 
+#input_vector_3 = np.array(generate_input_vector(my_user_3))
+
+#network_input_3 = input_vector_3[:,1:5005]
+#network_input_normed_3 = minmax_scale(network_input_3, axis = 0)
+#song_ratings_3 = model.predict(network_input_normed_3, verbose = 1)
+#print("762",input_vector_3[np.argmax(song_ratings_3)][0])
+
+
+
 
 # with open('ratings.csv', 'w', newline='') as csvfile:
 #    spamwriter = csv.writer(csvfile, delimiter='', quotechar='|', quoting=csv.QUOTE_MINIMAL)
