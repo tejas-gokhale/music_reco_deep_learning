@@ -23,26 +23,26 @@ input_size = 100	# OPTIONS: 100 (top-100 BOW), 5004 (all BOW)
 #####################
 
 if input_size == 5004:
-	train_set = np.genfromtxt('../data/all/data_train.csv', delimiter = ",")
-	print('1. Read Train')
-	np.random.shuffle(train_set)
-	test_set = np.genfromtxt('../data/all/data_test.csv', delimiter = ",")
-	print('2. Read Test')
-	np.random.shuffle(test_set)
-	valid_set = np.genfromtxt('../data/all/data_valid.csv', delimiter = ",")
-	print('3. Read Validation')
-	np.random.shuffle(valid_set)
-elif input_size == 100:
 	train_set = np.genfromtxt('../data/new/data_train.csv', delimiter = ",")
 	print('1. Read Train')
 	np.random.shuffle(train_set)
-	print("train_set.shape",train_set.shape)
 	test_set = np.genfromtxt('../data/new/data_test.csv', delimiter = ",")
+	print('2. Read Test')
+	np.random.shuffle(test_set)
+	valid_set = np.genfromtxt('../data/new/data_valid.csv', delimiter = ",")
+	print('3. Read Validation')
+	np.random.shuffle(valid_set)
+elif input_size == 100:
+	train_set = np.genfromtxt('../data/data_train.csv', delimiter = ",")
+	print('1. Read Train')
+	np.random.shuffle(train_set)
+	print("train_set.shape",train_set.shape)
+	test_set = np.genfromtxt('../data/data_test.csv', delimiter = ",")
 	print('2. Read Test')
 	np.random.shuffle(test_set)
 	print("test_set.shape",test_set.shape)
 	#np.savetxt("../data/test_shuffle.csv", test_set, delimiter=",", fmt='%s')
-	valid_set = np.genfromtxt('../data/new/data_valid.csv', delimiter = ",")
+	valid_set = np.genfromtxt('../data/data_valid.csv', delimiter = ",")
 	print('3. Read Validation')
 	np.random.shuffle(valid_set)
 	print("valid_set.shape",valid_set.shape)
@@ -114,9 +114,9 @@ for i in range(num_epochs):
 #print(train_history)
 #print(valid_history)
 plt.gca().set_yscale('log')
-plt.plot(range(1,num_epochs+1), train_history, label="train log-loss")
-plt.plot(range(1,num_epochs+1), valid_history, label="validation log-loss")
-plt.plot(range(1,num_epochs+1), test_history, label="test log-loss")
+plt.plot(range(1,num_epochs+1), train_history, label="train loss")
+plt.plot(range(1,num_epochs+1), valid_history, label="validation loss")
+plt.plot(range(1,num_epochs+1), test_history, label="test loss")
 plt.legend()
 plt.title('Training MSE Loss')
 plt.ylabel('Loss')
@@ -143,18 +143,24 @@ test_out_normed = np.expand_dims(test_out_normed, axis=1)
 
 my_user = '8305c896f42308824da7d4386f4b9ee584281412'
 input_vector = generate_input_vector(my_user)
+print (input_vector[0])
 
-network_input = input_vector[:,1:5005]
-network_input_normed = minmax_scale(network_input_normed, axis = 0)
+network_input = []
+for i in range(len(input_vector)):
+	network_input.append(input_vector[i][1:101])
+print (network_input[0])
+
+
+network_input_normed = minmax_scale(np.array(network_input), axis = 0)
 song_ratings = model.predict(network_input_normed, verbose = 1)
 
 print(input_vector[np.argmax(song_ratings)][0])
 
-#with open('ratings.csv', 'w', newline='') as csvfile:
+# with open('ratings.csv', 'w', newline='') as csvfile:
 #    spamwriter = csv.writer(csvfile, delimiter='', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
 #    for entry in song_ratings:
 #        spamwriter.writerow(entry)
 
-   # for entry in encoded_test:
-   #     spamwriter.writerow(entry)
+#    for entry in encoded_test:
+#        spamwriter.writerow(entry)
